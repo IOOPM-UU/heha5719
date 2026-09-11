@@ -1,0 +1,5 @@
+Hej!
+Detta är en testfil.
+Vi testar radnumrering i C.
+Varje rad ska få ett nummer.
+Det här är den sista raden.
