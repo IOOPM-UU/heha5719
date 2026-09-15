@@ -22,6 +22,47 @@ void test_create_destroy(void) {
     ioopm_hash_table_destroy(ht);
 }
 
+// If succesfully inserted should return true.
+
+void test_insert_once() {
+  // create new hash table
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "abc";
+  int value = 123;
+
+  // check that key is not in ht
+  int result = 0;
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0);
+
+  // insert key-value pair and check that the mapping exists
+  ioopm_hash_table_insert(ht, key, value);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value);
+
+  // destroy hash table
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_key_exist() {
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  // Create and insert one value
+  char *key = "abc";
+  int result = 0; 
+  int value1 = 123;
+  ioopm_hash_table_insert(ht, key, value1);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value1);
+
+  // Test replacing the first value with another
+  int value2 = 321;
+  ioopm_hash_table_insert(ht, key, value2);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value2);
+
+  ioopm_hash_table_destroy(ht);
+}
 
 
 int main() {
@@ -45,6 +86,8 @@ int main() {
   // copy a line below and change the information
   if (
     (CU_add_test(my_test_suite, "Create destroy test", test_create_destroy) == NULL) ||
+    (CU_add_test(my_test_suite, "No key with insert", test_insert_once) == NULL) ||
+    (CU_add_test(my_test_suite, "Key exist with insert", test_key_exist) == NULL) ||
     0
   )
     {
