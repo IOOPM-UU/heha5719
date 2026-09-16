@@ -6,6 +6,8 @@
 
 //This is a great example for both M39 and O44!
 
+#define No_Buckets 17
+
 typedef struct entry entry_t;
 
 struct entry
@@ -21,7 +23,7 @@ struct hash_table
 {
   // DODGE: hard-coding number of buckets as 17.
   // NOTE: addressing this dodge is optional.
-  entry_t buckets[17];
+  entry_t buckets[No_Buckets];
 };
 
 ioopm_hash_table_t *ioopm_hash_table_create(void) {
@@ -51,13 +53,13 @@ static entry_t *entry_create(char *key, int value, entry_t *next)
   return entry;
 }
 
-void entry_destroy(entry_t *entry) {
+static void entry_destroy(entry_t *entry) {
   free(entry);
 }
 
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < No_Buckets; i++) {
       entry_t *current = ht->buckets[i].next;
       while (current != NULL)  {
         entry_t *next = current->next;
@@ -69,9 +71,9 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
 }
 
 
-entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) {
+static entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) {
 
-   size_t bucket = string_knr_hash(key) % 17;
+   size_t bucket = string_knr_hash(key) % No_Buckets;
    entry_t *current = &ht->buckets[bucket];
    while (current->next != NULL && strcmp(current->next->key, key) != 0) {
       current = current->next;
@@ -84,9 +86,9 @@ int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key) {
   if (previous->next != NULL && strcmp(previous->next->key, key) == 0) {
     int deleted = previous->next->value;
     // If previous is A then put C into A's next thereby jumping over B
-    entry_t *tillsättas = previous->next->next;
+    entry_t *new_next = previous->next->next;
     entry_destroy(previous->next);
-    previous->next = tillsättas;
+    previous->next = new_next;
     return deleted;
   }
   else {
@@ -113,7 +115,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
 
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
 {
-  size_t bucket = string_knr_hash(key) % 17;
+  size_t bucket = string_knr_hash(key) % No_Buckets;
   // look for an entry with the key we want
   entry_t *current = ht->buckets[bucket].next;
   while (current != NULL && strcmp(current->key, key) != 0)

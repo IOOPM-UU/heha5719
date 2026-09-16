@@ -88,9 +88,9 @@ void test_remove_nonexist() {
   // Skapa key och hashtable
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   char *key = "abcde";
-  int finnsej = 0;
-  CU_ASSERT_EQUAL(finnsej, ioopm_hash_table_remove(ht, key));
-  
+  int expected = 0;
+  CU_ASSERT_EQUAL(expected, ioopm_hash_table_remove(ht, key));
+
   ioopm_hash_table_destroy(ht);
 }
 
