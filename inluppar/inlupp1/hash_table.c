@@ -69,7 +69,6 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
 }
 
 
-
 entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) {
 
    size_t bucket = string_knr_hash(key) % 17;
@@ -79,6 +78,22 @@ entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) {
    }
    return current;
 }
+
+int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key) {
+  entry_t *previous = find_previous_entry(ht, key);
+  if (previous->next != NULL && strcmp(previous->next->key, key) == 0) {
+    int deleted = previous->next->value;
+    // If previous is A then put C into A's next thereby jumping over B
+    entry_t *tillsättas = previous->next->next;
+    entry_destroy(previous->next);
+    previous->next = tillsättas;
+    return deleted;
+  }
+  else {
+    return 0;
+  }
+}
+
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
 {

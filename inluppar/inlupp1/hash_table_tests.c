@@ -64,6 +64,35 @@ void test_key_exist() {
   ioopm_hash_table_destroy(ht);
 }
 
+//remove existing value
+
+//remove non existing value
+
+void test_remove_exist() {
+  // Inserta en entry
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  char *key = "abcde";
+  int value = 324;
+  int result = 0;
+  ioopm_hash_table_insert(ht, key, value);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value);
+  // Ta bort och kolla att nyckeln ej finns i hash-tablet längre
+  ioopm_hash_table_remove(ht, key);
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_remove_nonexist() {
+  // Skapa key och hashtable
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  char *key = "abcde";
+  int finnsej = 0;
+  CU_ASSERT_EQUAL(finnsej, ioopm_hash_table_remove(ht, key));
+  
+  ioopm_hash_table_destroy(ht);
+}
 
 int main() {
   // First we try to set up CUnit, and exit if we fail
@@ -88,6 +117,8 @@ int main() {
     (CU_add_test(my_test_suite, "Create destroy test", test_create_destroy) == NULL) ||
     (CU_add_test(my_test_suite, "No key with insert", test_insert_once) == NULL) ||
     (CU_add_test(my_test_suite, "Key exist with insert", test_key_exist) == NULL) ||
+    (CU_add_test(my_test_suite, "Remove existing entry", test_remove_exist) == NULL) ||
+    (CU_add_test(my_test_suite, "Remove non-existing entry", test_remove_nonexist) == NULL) ||
     0
   )
     {
