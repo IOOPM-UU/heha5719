@@ -21,14 +21,14 @@ struct entry
 
 struct hash_table
 {
-  // DODGE: hard-coding number of buckets as 17.
+  // DODGE: hard-coding number of buckets as No_Buckets.
   // NOTE: addressing this dodge is optional.
   entry_t buckets[No_Buckets];
 };
 
 ioopm_hash_table_t *ioopm_hash_table_create(void) {
-  /// Allocate space for a ioopm_hash_table_t = 17 pointers to entry_t's
-  /// Allocate zeroed-out space for a ioopm_hash_table_t = 17 pointers to entry_t's
+  /// Allocate space for a ioopm_hash_table_t = No_Buckets pointers to entry_t's
+  /// Allocate zeroed-out space for a ioopm_hash_table_t = No_Buckets pointers to entry_t's
   return calloc(1, sizeof(ioopm_hash_table_t));
 }
 
@@ -81,18 +81,18 @@ static entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) {
    return current;
 }
 
-int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key) {
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result) {
   entry_t *previous = find_previous_entry(ht, key);
   if (previous->next != NULL && strcmp(previous->next->key, key) == 0) {
-    int deleted = previous->next->value;
+    *result = previous->next->value;
     // If previous is A then put C into A's next thereby jumping over B
     entry_t *new_next = previous->next->next;
     entry_destroy(previous->next);
     previous->next = new_next;
-    return deleted;
+    return true;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
@@ -136,3 +136,35 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
 }
 
 
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key) {
+  entry_t *previous = find_previous_entry(ht, key);
+  if (previous->next != NULL && strcmp(previous->next->key, key) == 0) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+static int bucket_size(entry_t *entry)
+{
+  int counter = 0;
+  while (entry != NULL) {
+    counter++;
+    entry = entry->next;
+  }
+  return counter;
+}
+
+int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+{
+  int counter = 0;
+  for (int i = 0; i < No_Buckets; i++) {
+    counter += bucket_size(ht->buckets[i].next);
+  }
+  return counter;
+}
+
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht) {
+  return ioopm_hash_table_size(ht) == 0;
+}

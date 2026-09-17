@@ -40,4 +40,13 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result);
 /// @param ht hash table operated upon
 /// @param key key to remove
 /// @return the value mapped to by key (FIXME: what if the key does not exist?)
-int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key);
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result);
+
+// TODO: documentation
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key);
+
+// TODO: documentation
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
+
+// TODO: documentation
+int ioopm_hash_table_size(ioopm_hash_table_t *ht);
