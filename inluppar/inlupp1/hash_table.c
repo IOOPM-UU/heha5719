@@ -63,6 +63,7 @@ struct hash_table_iterator
 
 
 static void entry_destroy(entry_t *entry) {
+  free(entry->key);
   free(entry);
 }
 
@@ -118,7 +119,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
   }
   else
   {
-    previous->next = entry_create(key, value, NULL);
+    previous->next = entry_create(strdup(key), value, NULL);
   }
 }
 
