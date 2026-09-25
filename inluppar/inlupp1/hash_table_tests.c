@@ -1,6 +1,7 @@
 #include <CUnit/Basic.h>
 #include "hash_table.h"
 #include "hash_table_iterator.h"
+#include "linked_list.h"
 
 int init_suite(void) {
   // Change this function if you want to do something *before* you
@@ -413,6 +414,182 @@ void test_iterator_same_bucket(void)
 
 
 
+
+
+
+// LINKED LIST TESTS
+
+
+
+
+
+
+
+
+//Create linked list
+
+void test_list_create(void) {
+  ioopm_list_t *list = ioopm_list_create();
+
+  CU_ASSERT_PTR_NOT_NULL(list);
+
+  ioopm_list_destroy(list);
+}
+
+//Destroy linked list and checks that it doesn't crash
+
+void test_list_destroy(void) {
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_destroy(list);
+}
+
+//Append linked list
+
+void test_list_append(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_append(list, 10);
+
+  CU_ASSERT_EQUAL(ioopm_list_size(list), 1);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
+
+  ioopm_list_destroy(list);
+}
+
+
+// Get from linked list
+
+void test_list_get(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_append(list, 10);
+
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
+
+  ioopm_list_destroy(list);
+}
+
+
+// Head of linked list
+
+void test_list_head(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_append(list, 10);
+  ioopm_list_append(list, 20);
+
+  CU_ASSERT_EQUAL(ioopm_list_head(list), 10);
+
+  ioopm_list_destroy(list);
+}
+
+
+// Insert in linked list
+
+void test_list_insert(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_append(list, 10);
+  ioopm_list_append(list, 30);
+
+  ioopm_list_insert(list, 1, 20);
+
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 1), 20);
+
+  ioopm_list_destroy(list);
+}
+
+
+// Is linked list empty?
+
+void test_list_empty(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  CU_ASSERT_TRUE(ioopm_list_is_empty(list));
+
+  ioopm_list_append(list, 10);
+
+  CU_ASSERT_FALSE(ioopm_list_is_empty(list));
+
+  ioopm_list_destroy(list);
+}
+
+
+// Last of linked list
+
+void test_list_last(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_append(list, 10);
+  ioopm_list_append(list, 20);
+
+  CU_ASSERT_EQUAL(ioopm_list_last(list), 20);
+
+  ioopm_list_destroy(list);
+}
+
+
+// Remove from linked list
+
+void test_list_remove(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_append(list, 10);
+  ioopm_list_append(list, 20);
+  ioopm_list_append(list, 30);
+
+  int removed = ioopm_list_remove(list, 1);
+
+  CU_ASSERT_EQUAL(removed, 20);
+  CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 1), 30);
+
+  ioopm_list_destroy(list);
+}
+
+
+// Prepend to linked list
+
+void test_list_prepend(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_prepend(list, 20);
+  ioopm_list_prepend(list, 10);
+
+  CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 1), 20);
+
+  ioopm_list_destroy(list);
+}
+
+
+// Check size of linked list
+
+void test_list_size(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  CU_ASSERT_EQUAL(ioopm_list_size(list), 0);
+
+  ioopm_list_append(list, 10);
+
+  CU_ASSERT_EQUAL(ioopm_list_size(list), 1);
+
+  ioopm_list_destroy(list);
+}
+
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -421,7 +598,9 @@ int main() {
   // We then create an empty test suite and specify the name and
   // the init and cleanup functions
   CU_pSuite my_test_suite = CU_add_suite("My awesome test suite", init_suite, clean_suite);
-  if (my_test_suite == NULL) {
+  CU_pSuite linked_list_suite = CU_add_suite("My linked list test suite", init_suite, clean_suite);
+
+  if (my_test_suite == NULL || linked_list_suite == NULL) {
       // If the test suite could not be added, tear down CUnit and exit
       CU_cleanup_registry();
       return CU_get_error();
@@ -453,6 +632,17 @@ int main() {
     (CU_add_test(my_test_suite, "Iterating over a iterator with multiple entries", test_iterator_several_entries) == NULL) ||
     (CU_add_test(my_test_suite, "Checking that there's one for every entry", test_iterator_every_entry_once) == NULL) ||
     (CU_add_test(my_test_suite, "Iterating over multiple entries in the same bucket", test_iterator_same_bucket) == NULL) ||
+    (CU_add_test(linked_list_suite, "Create linked list", test_list_create) == NULL) ||
+    (CU_add_test(linked_list_suite, "Destroy linked list", test_list_destroy) == NULL) ||
+    (CU_add_test(linked_list_suite, "Append linked list", test_list_append) == NULL) ||
+    (CU_add_test(linked_list_suite, "Get linked list", test_list_get) == NULL) ||
+    (CU_add_test(linked_list_suite, "Head of linked list", test_list_head) == NULL) ||
+    (CU_add_test(linked_list_suite, "Insert in linked list", test_list_insert) == NULL) ||
+    (CU_add_test(linked_list_suite, "Is linked list empty", test_list_empty) == NULL) ||
+    (CU_add_test(linked_list_suite, "Last of linked list", test_list_last) == NULL) ||
+    (CU_add_test(linked_list_suite, "Remove linked list", test_list_remove) == NULL) ||
+    (CU_add_test(linked_list_suite, "Prepend linked list", test_list_prepend) == NULL) ||
+    (CU_add_test(linked_list_suite, "Size of linked list", test_list_size) == NULL) ||
     0 
   )
     {
