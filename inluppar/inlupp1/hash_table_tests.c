@@ -2,6 +2,7 @@
 #include "hash_table.h"
 #include "hash_table_iterator.h"
 #include "linked_list.h"
+#include "list_iterator.h"
 
 int init_suite(void) {
   // Change this function if you want to do something *before* you
@@ -590,6 +591,86 @@ void test_list_size(void)
 }
 
 
+
+
+
+// ITERATOR TESTS
+
+// Checks that the iterator has been created
+
+void test_iterator_create(void)
+{
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_append(list, 1);
+
+    ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
+
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 1);
+
+    ioopm_list_iterator_destroy(it);
+    ioopm_list_destroy(list);
+}
+
+// Checks that no memory leaks appear
+
+void test_iterator_destroy(void)
+{
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
+
+    ioopm_list_iterator_destroy(it);
+
+    ioopm_list_destroy(list);
+}
+
+// Checks that the iterator is at the end
+
+void test_iterator_at_end(void)
+{
+    ioopm_list_t *empty = ioopm_list_create();
+    ioopm_list_iterator_t *it = ioopm_list_iterator_create(empty);
+
+    CU_ASSERT_TRUE(ioopm_list_iterator_at_end(it));
+
+    ioopm_list_iterator_destroy(it);
+    ioopm_list_destroy(empty);
+}
+
+// Checks so the iterator is same as in the list
+
+void test_iterator_current(void)
+{
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_append(list, 1);
+
+    ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
+
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 1);
+
+    ioopm_list_iterator_destroy(it);
+    ioopm_list_destroy(list);
+}
+
+// Checks that the iterator moves forward when called
+
+void test_iterator_advance(void)
+{
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_append(list, 1);
+    ioopm_list_append(list, 2);
+
+    ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
+
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 1);
+
+    ioopm_list_iterator_advance(it);
+
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 2);
+
+    ioopm_list_iterator_destroy(it);
+    ioopm_list_destroy(list);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -643,6 +724,11 @@ int main() {
     (CU_add_test(linked_list_suite, "Remove linked list", test_list_remove) == NULL) ||
     (CU_add_test(linked_list_suite, "Prepend linked list", test_list_prepend) == NULL) ||
     (CU_add_test(linked_list_suite, "Size of linked list", test_list_size) == NULL) ||
+    (CU_add_test(linked_list_suite, "Create", test_iterator_create) == NULL) ||
+    (CU_add_test(linked_list_suite, "Destroy iterator", test_iterator_destroy) == NULL) ||
+    (CU_add_test(linked_list_suite, "Iterator is at the end of the list", test_iterator_at_end) == NULL) ||
+    (CU_add_test(linked_list_suite, "Current element of iterator", test_iterator_current) == NULL) ||
+    (CU_add_test(linked_list_suite, "Advance in iterator", test_iterator_advance) == NULL) ||
     0 
   )
     {

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "linked_list.h"
+#include "list_iterator.h"
 
 typedef struct link link_t;
 
@@ -16,6 +17,11 @@ struct list {
     link_t *head;
     link_t *last;
     int size; 
+};
+
+struct list_iterator {
+    ioopm_list_t *list;
+    link_t *current;
 };
 
 // Own subfunction for freeing one sublist
@@ -177,6 +183,40 @@ int ioopm_list_get(ioopm_list_t *list, int index) {
 }
 
 
+// LIST ITERATOR PART
 
 
+ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l) {
+    ioopm_list_iterator_t *iterator = calloc(1, sizeof(ioopm_list_iterator_t));
+    iterator->list = l;
+    iterator->current = l->head;
+
+    return iterator;
+}
+
+void ioopm_list_iterator_destroy(ioopm_list_iterator_t *iter) {
+    free(iter);
+}
+
+bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter) {
+    return iter->current == NULL;
+}
+
+int ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
+    if (iter->current == NULL) {
+        return 0;
+    }
+    else {
+    return iter->current->value;
+    }
+}
+
+void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter) {
+    if (ioopm_list_iterator_at_end(iter)) {
+        printf("List is unable to advance");
+    }
+    else {
+        iter->current = iter->current->next;
+    }
+}
 
