@@ -7,6 +7,11 @@
 
 //This is a great example for both M39 and O44!
 
+/*
+  arr[5] = 5[arr] = *(arr + 5) = *(5 + arr)
+  *(arr + 5) = *(5 + arr) = 5[arr]
+*/
+
 #define No_Buckets 17
 
 typedef struct entry entry_t;
@@ -57,7 +62,7 @@ static entry_t *entry_create(char *key, int value, entry_t *next)
 struct hash_table_iterator
 {
   ioopm_hash_table_t *ht;
-  int current_bucket;
+  size_t current_bucket;
   entry_t *current_entry;
 };
 
@@ -67,9 +72,8 @@ static void entry_destroy(entry_t *entry) {
   free(entry);
 }
 
-
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
-    for (int i = 0; i < No_Buckets; i++) {
+    for (size_t i = 0; i < No_Buckets; i++) {
       entry_t *current = ht->buckets[i].next;
       while (current != NULL)  {
         entry_t *next = current->next;
@@ -156,9 +160,9 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key) {
   }
 }
 
-static int bucket_size(entry_t *entry)
+static size_t bucket_size(entry_t *entry)
 {
-  int counter = 0;
+  size_t counter = 0;
   while (entry != NULL) {
     counter++;
     entry = entry->next;
@@ -166,10 +170,10 @@ static int bucket_size(entry_t *entry)
   return counter;
 }
 
-int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
 {
-  int counter = 0;
-  for (int i = 0; i < No_Buckets; i++) {
+  size_t counter = 0;
+  for (size_t i = 0; i < No_Buckets; i++) {
     counter += bucket_size(ht->buckets[i].next);
   }
   return counter;

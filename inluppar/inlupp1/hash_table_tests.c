@@ -1,6 +1,7 @@
 #include <CUnit/Basic.h>
 #include "hash_table.h"
 #include "hash_table_iterator.h"
+#include <string.h>
 #include "linked_list.h"
 #include "list_iterator.h"
 
@@ -314,12 +315,12 @@ void test_iterator_several_entries()
 
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
-  for (int i = 0; i < 3; ++i)
+  for (size_t i = 0; i < 3; ++i)
   {
     ioopm_hash_table_insert(ht, keys[i], values[i]);
   }
 
-  int iteration_count = 0;
+  size_t iteration_count = 0;
 
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
 
@@ -346,7 +347,7 @@ void test_iterator_every_entry_once()
 
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
-  for (int i = 0; i < 3; ++i)
+  for (size_t i = 0; i < 3; ++i)
   {
     ioopm_hash_table_insert(ht, keys[i], values[i]);
   }
@@ -400,7 +401,7 @@ void test_iterator_same_bucket(void)
   ioopm_hash_table_iterator_t *it =
     ioopm_hash_table_iterator_create(ht);
 
-  int count = 0;
+  size_t count = 0;
 
   while (!ioopm_hash_table_iterator_at_end(it))
   {
@@ -412,8 +413,6 @@ void test_iterator_same_bucket(void)
   ioopm_hash_table_iterator_destroy(it);
   ioopm_hash_table_destroy(ht);
 }
-
-
 
 
 
@@ -747,4 +746,4 @@ int main() {
   // Tear down CUnit before exiting
   CU_cleanup_registry();
   return CU_get_error();
-} 
+}  

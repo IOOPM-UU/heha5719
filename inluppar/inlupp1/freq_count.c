@@ -99,14 +99,14 @@ int main(int argc, char *argv[])
     process_file(argv[i], ht);
   }
 
-  int size = ioopm_hash_table_size(ht);
+  size_t size = ioopm_hash_table_size(ht);
   struct freq_word freq_words[size];
 
   // FIXME: Iterate over hash table to dump its words and
   // frequencies into the array above
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
 
-  int i = 0;
+  size_t i = 0;
 
   while (!ioopm_hash_table_iterator_at_end(it)) {
     freq_words[i].word = ioopm_hash_table_iterator_current_key(it);
@@ -117,9 +117,9 @@ int main(int argc, char *argv[])
   }
   sort_freq_words(freq_words, size);
 
-  for (int i = 0; i < size; ++i)
+  for (size_t i = 0; i < size; ++i)
   {
-    printf("%s: %d\n", freq_words[i].word, freq_words[i].freq);
+    printf("%s: %zu\n", freq_words[i].word, freq_words[i].freq);
   }
 
   // FIXME: Leaks memory! Use valgrind to find out where that memory is

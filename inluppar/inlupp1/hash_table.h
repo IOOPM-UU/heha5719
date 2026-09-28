@@ -49,4 +49,4 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key);
 bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
 
 // TODO: documentation
-int ioopm_hash_table_size(ioopm_hash_table_t *ht);
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht);

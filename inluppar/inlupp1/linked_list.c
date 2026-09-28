@@ -16,7 +16,7 @@ struct link {
 struct list {
     link_t *head;
     link_t *last;
-    int size; 
+    size_t size; 
 };
 
 struct list_iterator {
@@ -38,7 +38,7 @@ ioopm_list_t *ioopm_list_create(void) {
 
 // CHecks size for list
 
-int ioopm_list_size(ioopm_list_t *list) {
+size_t ioopm_list_size(ioopm_list_t *list) {
     return list->size;
 }
 
@@ -102,21 +102,21 @@ int ioopm_list_last(ioopm_list_t *list) {
     return list->last->value;
 }
 
-void ioopm_list_insert(ioopm_list_t *list, int index, int value) {
+void ioopm_list_insert(ioopm_list_t *list, size_t index, int value) {
     if (index == 0) {
         ioopm_list_prepend(list, value);
     }
     else if (index == ioopm_list_size(list)) {
         ioopm_list_append(list, value);
     }
-    else if (index > ioopm_list_size(list) || index < 0) {
+    else if (index > ioopm_list_size(list)) {
         printf("Incorrect index");
     }
     else {
         link_t *new_link = calloc(1, sizeof(link_t));
         new_link->value = value;
         link_t *current = list->head;
-        for (int i = 0; i < index - 1; i++) {
+        for (size_t i = 0; i < index - 1; i++) {
             current = current->next;
         }
         new_link->next = current->next;
@@ -125,8 +125,8 @@ void ioopm_list_insert(ioopm_list_t *list, int index, int value) {
     }
 }
 
-int ioopm_list_remove(ioopm_list_t *list, int index) {
-    if (list->head == NULL || index >= ioopm_list_size(list) || index < 0) {
+int ioopm_list_remove(ioopm_list_t *list, size_t index) {
+    if (list->head == NULL || index >= ioopm_list_size(list)) {
         printf("Nothing to remove");
         return 0;
     }
@@ -143,7 +143,7 @@ int ioopm_list_remove(ioopm_list_t *list, int index) {
     }
     else if (index == ioopm_list_size(list) - 1) {
         link_t *current = list->head;
-        for (int i = 0; i < index - 1; i++) {
+        for (size_t i = 0; i < index - 1; i++) {
             current = current->next;
         }
         link_t *removed = list->last;
@@ -156,7 +156,7 @@ int ioopm_list_remove(ioopm_list_t *list, int index) {
     }
     else {
         link_t *current = list->head;
-        for (int i = 0; i < index - 1; i++) {
+        for (size_t i = 0; i < index - 1; i++) {
             current = current->next;
         }
         link_t *removed = current->next;
@@ -168,14 +168,14 @@ int ioopm_list_remove(ioopm_list_t *list, int index) {
     }
 }
 
-int ioopm_list_get(ioopm_list_t *list, int index) {
-    if (list->head == NULL || index >= ioopm_list_size(list) || index < 0) {
+int ioopm_list_get(ioopm_list_t *list, size_t index) {
+    if (list->head == NULL || index >= ioopm_list_size(list)) {
         printf("Not valid");
         return 0;
     }
     else {
     link_t *current = list->head;
-    for (int i = 0; i < index; i++) {
+    for (size_t i = 0; i < index; i++) {
         current = current->next;
     }
     return current->value;
