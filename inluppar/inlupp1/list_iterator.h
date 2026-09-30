@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stddef.h>
+#include "common.h"
 
 #include "linked_list.h"
 
@@ -26,4 +27,4 @@ void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter);
 /// @brief Return the current element from the underlying list
 /// @param iter the iterator
 /// @return the current element
-int ioopm_list_iterator_current(ioopm_list_iterator_t *iter);
+elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter);

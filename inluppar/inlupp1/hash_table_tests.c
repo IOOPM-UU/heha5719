@@ -4,6 +4,29 @@
 #include <string.h>
 #include "linked_list.h"
 #include "list_iterator.h"
+#include "common.h"
+
+static size_t string_knr_hash(const char *str)
+{
+  size_t result = 0;
+
+  while (*str != '\0')
+  {
+    result = result * 31 + ((unsigned char) *str);
+    str++;
+  }
+
+  return result;
+}
+
+size_t string_hash(elem_t key)
+{
+  return string_knr_hash(key.s);
+}
+
+bool string_eq(elem_t a, elem_t b) {
+  return strcmp(a.s, b.s) == 0;
+}
 
 int init_suite(void) {
   // Change this function if you want to do something *before* you
@@ -23,7 +46,7 @@ int clean_suite(void) {
 // functions of your own.
 
 void test_create_destroy(void) {
-    ioopm_hash_table_t *ht = ioopm_hash_table_create();
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
     CU_ASSERT_PTR_NOT_NULL(ht);
     ioopm_hash_table_destroy(ht);
 }
@@ -32,40 +55,40 @@ void test_create_destroy(void) {
 
 void test_insert_once() {
   // create new hash table
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
 
-  char *key = "abc";
-  int value = 123;
+  elem_t key = string_elem("abc");
+  elem_t value = int_elem(123);
 
   // check that key is not in ht
-  int result = 0;
+  elem_t result = int_elem(0);
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, 0);
+  CU_ASSERT_EQUAL(result.i, 0);
 
   // insert key-value pair and check that the mapping exists
   ioopm_hash_table_insert(ht, key, value);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, value);
+  CU_ASSERT_EQUAL(result.i, value.i);
 
   // destroy hash table
   ioopm_hash_table_destroy(ht);
 }
 
 void test_key_exist() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
   // Create and insert one value
-  char *key = "abc";
-  int result = 0; 
-  int value1 = 123;
+  elem_t key = string_elem("abc");
+  elem_t result = int_elem(0); 
+  elem_t value1 = int_elem(123);
   ioopm_hash_table_insert(ht, key, value1);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, value1);
+  CU_ASSERT_EQUAL(result.i, value1.i);
 
   // Test replacing the first value with another
-  int value2 = 321;
+  elem_t value2 = int_elem(321);
   ioopm_hash_table_insert(ht, key, value2);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, value2);
+  CU_ASSERT_EQUAL(result.i, value2.i);
 
   ioopm_hash_table_destroy(ht);
 }
@@ -76,13 +99,13 @@ void test_key_exist() {
 
 void test_remove_exist() {
   // Inserta en entry
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
-  int value = 324;
-  int result = 0;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
+  elem_t value = int_elem(324);
+  elem_t result = int_elem(0);
   ioopm_hash_table_insert(ht, key, value);
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
-  CU_ASSERT_EQUAL(result, value);
+  CU_ASSERT_EQUAL(result.i, value.i);
   // Ta bort och kolla att nyckeln ej finns i hash-tablet längre
   ioopm_hash_table_remove(ht, key, &result);
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
@@ -92,9 +115,9 @@ void test_remove_exist() {
 
 void test_remove_nonexist() {
   // Skapa key och hashtable
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
-  int result = 0;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
+  elem_t result = int_elem(0);
   CU_ASSERT_FALSE(ioopm_hash_table_remove(ht, key, &result));
 
   ioopm_hash_table_destroy(ht);
@@ -104,8 +127,8 @@ void test_remove_nonexist() {
 
 
 void test_has_key() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
   CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, key));
 
   ioopm_hash_table_destroy(ht);
@@ -115,10 +138,10 @@ void test_has_key() {
 
 
 void test_has_one_key() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
-  char *key2 = "kdfkkd";
-  int value = 1;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
+  elem_t key2 = string_elem("kdfkkd");
+  elem_t value = int_elem(1);
   ioopm_hash_table_insert(ht, key, value);
   CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key));
   CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, key2));
@@ -129,14 +152,14 @@ void test_has_one_key() {
 //Create a hash table and insert keys k1, k2 and k3. Check if all three keys are present (they should be). Also check if it has some other key k4 (it shouldn’t).
 
 void test_has_three_keys() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
-  char *key2 = "kdfkkd";
-  char *key3 = "ndvndnv";
-  char *key4 = "xzzxxxx";
-  int value = 1;
-  int value2 = 2;
-  int value3 = 3;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
+  elem_t key2 = string_elem("kdfkkd");
+  elem_t key3 = string_elem("ndvndnv");
+  elem_t key4 = string_elem("xzzxxxx");
+  elem_t value = int_elem(1);
+  elem_t value2 = int_elem(2);
+  elem_t value3 = int_elem(3);
   ioopm_hash_table_insert(ht, key, value);
   ioopm_hash_table_insert(ht, key2, value2);
   ioopm_hash_table_insert(ht, key3, value3);
@@ -151,10 +174,10 @@ void test_has_three_keys() {
 //Create a hash table and insert key k, and immediately remove it. Check if has key k (it shouldn’t).
 
 void test_insert_remove_key() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abc"; 
-  int value = 1;
-  int result = 0;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abc"); 
+  elem_t value = int_elem(1);
+  elem_t result = int_elem(0);
   ioopm_hash_table_insert(ht, key, value);
   ioopm_hash_table_remove(ht, key, &result);
   CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, key));
@@ -165,14 +188,14 @@ void test_insert_remove_key() {
 //Create a hash table and insert keys k1, k2 and k3. Remove key k2. Check if it has keys k1 and k3 (it should). Check if it has key k2 (it shouldn’t).
 
 void test_insert_remove_middle_key() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
-  char *key2 = "kdfkkd";
-  char *key3 = "ndvndnv";
-  int value = 1;
-  int value2 = 2;
-  int value3 = 3;
-  int result = 0;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
+  elem_t key2 = string_elem("kdfkkd");
+  elem_t key3 = string_elem("ndvndnv");
+  elem_t value = int_elem(1);
+  elem_t value2 = int_elem(2);
+  elem_t value3 = int_elem(3);
+  elem_t result = int_elem(0);
   ioopm_hash_table_insert(ht, key, value);
   ioopm_hash_table_insert(ht, key2, value2);
   ioopm_hash_table_insert(ht, key3, value3);
@@ -188,7 +211,7 @@ void test_insert_remove_middle_key() {
 
 void test_size_empty(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
   ioopm_hash_table_destroy(ht);
 }
@@ -198,9 +221,9 @@ void test_size_empty(void)
 
 void test_size_one(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abc";
-  int value = 2;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abc");
+  elem_t value = int_elem(2);
 
   ioopm_hash_table_insert(ht, key, value);
 
@@ -214,13 +237,13 @@ void test_size_one(void)
 
 void test_size_multiple(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
-  char *key2 = "kdfkkd";
-  char *key3 = "ndvndnv";
-  int value = 1;
-  int value2 = 2;
-  int value3 = 3;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
+  elem_t key2 = string_elem("kdfkkd");
+  elem_t key3 = string_elem("ndvndnv");
+  elem_t value = int_elem(1);
+  elem_t value2 = int_elem(2);
+  elem_t value3 = int_elem(3);
 
   ioopm_hash_table_insert(ht, key, value);
   ioopm_hash_table_insert(ht, key2, value2);
@@ -236,14 +259,14 @@ void test_size_multiple(void)
 
 void test_size_after_remove(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "abcde";
-  char *key2 = "kdfkkd";
-  char *key3 = "ndvndnv";
-  int value = 1;
-  int value2 = 2;
-  int value3 = 3;
-  int result = 0;
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  elem_t key = string_elem("abcde");
+  elem_t key2 = string_elem("kdfkkd");
+  elem_t key3 = string_elem("ndvndnv");
+  elem_t value = int_elem(1);
+  elem_t value2 = int_elem(2);
+  elem_t value3 = int_elem(3);
+  elem_t result = int_elem(0);
   ioopm_hash_table_insert(ht, key, value);
   ioopm_hash_table_insert(ht, key2, value2);
   ioopm_hash_table_insert(ht, key3, value3);
@@ -258,7 +281,7 @@ void test_size_after_remove(void)
 
 void test_hash_table_is_empty(void) 
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
   CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht));
 
   ioopm_hash_table_destroy(ht);
@@ -269,7 +292,7 @@ void test_hash_table_is_empty(void)
 
 void test_iterator_empty()
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
 
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
 
@@ -283,24 +306,22 @@ void test_iterator_empty()
 
 void test_iterator_one_entry()
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
 
-  ioopm_hash_table_insert(ht, "abc", 123);
+  elem_t key = string_elem("abc");
+
+  elem_t value = int_elem(123);
+
+  ioopm_hash_table_insert(ht, key, value);
 
   ioopm_hash_table_iterator_t *it =
     ioopm_hash_table_iterator_create(ht);
 
   CU_ASSERT_FALSE(ioopm_hash_table_iterator_at_end(it));
 
-  CU_ASSERT_STRING_EQUAL(
-    ioopm_hash_table_iterator_current_key(it),
-    "abc"
-  );
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it).s, "abc");
 
-  CU_ASSERT_EQUAL(
-    ioopm_hash_table_iterator_current_value(it),
-    123
-    );
+  CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it).i, 123);
 
   ioopm_hash_table_iterator_destroy(it);
   ioopm_hash_table_destroy(ht);
@@ -310,10 +331,10 @@ void test_iterator_one_entry()
 
 void test_iterator_several_entries()
 {
-  char *keys[3] = {"abc", "qwe", "asd"};
-  int values[3] = {0, 1, 2};
+  elem_t keys[3] = {string_elem("abc"), string_elem("qwe"), string_elem("asd")};
+  elem_t values[3] = {int_elem(0), int_elem(1), int_elem(2)};
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
 
   for (size_t i = 0; i < 3; ++i)
   {
@@ -340,12 +361,12 @@ void test_iterator_several_entries()
 
 void test_iterator_every_entry_once()
 {
-  char *keys[3] = {"abc", "qwe", "asd"};
-  int values[3] = {10, 20, 30};
+  elem_t keys[3] = {string_elem("abc"), string_elem("qwe"), string_elem("asd")};
+  elem_t values[3] = {int_elem(10), int_elem(20), int_elem(30)};
 
   int counts[3] = {0, 0, 0};
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
 
   for (size_t i = 0; i < 3; ++i)
   {
@@ -356,23 +377,23 @@ void test_iterator_every_entry_once()
 
   while (!ioopm_hash_table_iterator_at_end(it))
   {
-    char *key = ioopm_hash_table_iterator_current_key(it);
-    int value = ioopm_hash_table_iterator_current_value(it);
+    elem_t key = ioopm_hash_table_iterator_current_key(it);
+    elem_t value = ioopm_hash_table_iterator_current_value(it);
 
-    if (strcmp(key, "abc") == 0)
+    if (strcmp(key.s, "abc") == 0)
       {
         counts[0]++;
-        CU_ASSERT_EQUAL(value, 10);
+        CU_ASSERT_EQUAL(value.i, 10);
       }
-    else if (strcmp(key, "qwe") == 0)
+    else if (strcmp(key.s, "qwe") == 0)
       {
         counts[1]++;
-        CU_ASSERT_EQUAL(value, 20);
+        CU_ASSERT_EQUAL(value.i, 20);
       }
-    else if (strcmp(key, "asd") == 0)
+    else if (strcmp(key.s, "asd") == 0)
       {
         counts[2]++;
-        CU_ASSERT_EQUAL(value, 30);
+        CU_ASSERT_EQUAL(value.i, 30);
       }
     else
       {
@@ -392,11 +413,18 @@ void test_iterator_every_entry_once()
 
 void test_iterator_same_bucket(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
 
-  ioopm_hash_table_insert(ht, "a", 10);
-  ioopm_hash_table_insert(ht, "b", 20);
-  ioopm_hash_table_insert(ht, "c", 30);
+  elem_t value = int_elem(1);
+  elem_t value2 = int_elem(2);
+  elem_t value3 = int_elem(3);
+  elem_t key = string_elem("a");
+  elem_t key2 = string_elem("b");
+  elem_t key3 = string_elem("c");
+
+  ioopm_hash_table_insert(ht, key, value);
+  ioopm_hash_table_insert(ht, key2, value2);
+  ioopm_hash_table_insert(ht, key3, value3);
 
   ioopm_hash_table_iterator_t *it =
     ioopm_hash_table_iterator_create(ht);
@@ -450,10 +478,10 @@ void test_list_append(void)
 {
   ioopm_list_t *list = ioopm_list_create();
 
-  ioopm_list_append(list, 10);
+  ioopm_list_append(list, int_elem(10));
 
   CU_ASSERT_EQUAL(ioopm_list_size(list), 1);
-  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0).i, 10);
 
   ioopm_list_destroy(list);
 }
@@ -465,9 +493,9 @@ void test_list_get(void)
 {
   ioopm_list_t *list = ioopm_list_create();
 
-  ioopm_list_append(list, 10);
+  ioopm_list_append(list, int_elem(10));
 
-  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0).i, 10);
 
   ioopm_list_destroy(list);
 }
@@ -479,10 +507,10 @@ void test_list_head(void)
 {
   ioopm_list_t *list = ioopm_list_create();
 
-  ioopm_list_append(list, 10);
-  ioopm_list_append(list, 20);
+  ioopm_list_append(list, int_elem(10));
+  ioopm_list_append(list, int_elem(20));
 
-  CU_ASSERT_EQUAL(ioopm_list_head(list), 10);
+  CU_ASSERT_EQUAL(ioopm_list_head(list).i, 10);
 
   ioopm_list_destroy(list);
 }
@@ -494,12 +522,12 @@ void test_list_insert(void)
 {
   ioopm_list_t *list = ioopm_list_create();
 
-  ioopm_list_append(list, 10);
-  ioopm_list_append(list, 30);
+  ioopm_list_append(list, int_elem(10));
+  ioopm_list_append(list, int_elem(30));
 
-  ioopm_list_insert(list, 1, 20);
+  ioopm_list_insert(list, 1, int_elem(20));
 
-  CU_ASSERT_EQUAL(ioopm_list_get(list, 1), 20);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 1).i, 20);
 
   ioopm_list_destroy(list);
 }
@@ -513,7 +541,7 @@ void test_list_empty(void)
 
   CU_ASSERT_TRUE(ioopm_list_is_empty(list));
 
-  ioopm_list_append(list, 10);
+  ioopm_list_append(list, int_elem(10));
 
   CU_ASSERT_FALSE(ioopm_list_is_empty(list));
 
@@ -527,10 +555,10 @@ void test_list_last(void)
 {
   ioopm_list_t *list = ioopm_list_create();
 
-  ioopm_list_append(list, 10);
-  ioopm_list_append(list, 20);
+  ioopm_list_append(list, int_elem(10));
+  ioopm_list_append(list, int_elem(20));
 
-  CU_ASSERT_EQUAL(ioopm_list_last(list), 20);
+  CU_ASSERT_EQUAL(ioopm_list_last(list).i, 20);
 
   ioopm_list_destroy(list);
 }
@@ -542,16 +570,16 @@ void test_list_remove(void)
 {
   ioopm_list_t *list = ioopm_list_create();
 
-  ioopm_list_append(list, 10);
-  ioopm_list_append(list, 20);
-  ioopm_list_append(list, 30);
+  ioopm_list_append(list, int_elem(10));
+  ioopm_list_append(list, int_elem(20));
+  ioopm_list_append(list, int_elem(30));
 
-  int removed = ioopm_list_remove(list, 1);
+  elem_t removed = ioopm_list_remove(list, 1);
 
-  CU_ASSERT_EQUAL(removed, 20);
+  CU_ASSERT_EQUAL(removed.i, 20);
   CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
-  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
-  CU_ASSERT_EQUAL(ioopm_list_get(list, 1), 30);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0).i, 10);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 1).i, 30);
 
   ioopm_list_destroy(list);
 }
@@ -563,12 +591,12 @@ void test_list_prepend(void)
 {
   ioopm_list_t *list = ioopm_list_create();
 
-  ioopm_list_prepend(list, 20);
-  ioopm_list_prepend(list, 10);
+  ioopm_list_prepend(list, int_elem(20));
+  ioopm_list_prepend(list, int_elem(10));
 
   CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
-  CU_ASSERT_EQUAL(ioopm_list_get(list, 0), 10);
-  CU_ASSERT_EQUAL(ioopm_list_get(list, 1), 20);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0).i, 10);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 1).i, 20);
 
   ioopm_list_destroy(list);
 }
@@ -582,7 +610,7 @@ void test_list_size(void)
 
   CU_ASSERT_EQUAL(ioopm_list_size(list), 0);
 
-  ioopm_list_append(list, 10);
+  ioopm_list_append(list, int_elem(10));
 
   CU_ASSERT_EQUAL(ioopm_list_size(list), 1);
 
@@ -600,11 +628,11 @@ void test_list_size(void)
 void test_iterator_create(void)
 {
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 1);
+    ioopm_list_append(list, int_elem(1));
 
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 1);
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list);
@@ -640,11 +668,11 @@ void test_iterator_at_end(void)
 void test_iterator_current(void)
 {
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 1);
+    ioopm_list_append(list, int_elem(1));
 
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 1);
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list);
@@ -655,16 +683,16 @@ void test_iterator_current(void)
 void test_iterator_advance(void)
 {
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 1);
-    ioopm_list_append(list, 2);
+    ioopm_list_append(list, int_elem(1));
+    ioopm_list_append(list, int_elem(2));
 
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 1);
 
     ioopm_list_iterator_advance(it);
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), 2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 2);
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list);

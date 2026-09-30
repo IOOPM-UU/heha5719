@@ -5,11 +5,12 @@
 #include <stdio.h>
 #include "linked_list.h"
 #include "list_iterator.h"
+#include "common.h"
 
 typedef struct link link_t;
 
 struct link {
-    int value;
+    elem_t value;
     link_t *next;
 };
 
@@ -63,7 +64,7 @@ void ioopm_list_destroy(ioopm_list_t *list) {
     free(list);
 }
 
-void ioopm_list_append(ioopm_list_t *list, int value) {
+void ioopm_list_append(ioopm_list_t *list, elem_t value) {
     link_t *new_link = calloc(1, sizeof(link_t));
     new_link->value = value;
     new_link->next = NULL;
@@ -79,7 +80,7 @@ void ioopm_list_append(ioopm_list_t *list, int value) {
     }
 }
 
-void ioopm_list_prepend(ioopm_list_t *list, int value) {
+void ioopm_list_prepend(ioopm_list_t *list, elem_t value) {
     link_t *new_link = calloc(1, sizeof(link_t));
     new_link->value = value; 
     new_link->next = list->head;
@@ -94,15 +95,15 @@ void ioopm_list_prepend(ioopm_list_t *list, int value) {
     }
 }
 
-int ioopm_list_head(ioopm_list_t *list) {
+elem_t ioopm_list_head(ioopm_list_t *list) {
     return list->head->value;
 }
 
-int ioopm_list_last(ioopm_list_t *list) {
+elem_t ioopm_list_last(ioopm_list_t *list) {
     return list->last->value;
 }
 
-void ioopm_list_insert(ioopm_list_t *list, size_t index, int value) {
+void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value) {
     if (index == 0) {
         ioopm_list_prepend(list, value);
     }
@@ -125,14 +126,14 @@ void ioopm_list_insert(ioopm_list_t *list, size_t index, int value) {
     }
 }
 
-int ioopm_list_remove(ioopm_list_t *list, size_t index) {
+elem_t ioopm_list_remove(ioopm_list_t *list, size_t index) {
     if (list->head == NULL || index >= ioopm_list_size(list)) {
         printf("Nothing to remove");
-        return 0;
+        return (elem_t) {0};
     }
     else if (index == 0) {
         link_t *removed = list->head;
-        int value = removed->value;
+        elem_t value = removed->value;
         list->head = list->head->next;
         if (list->size == 1) {
             list->last = NULL;
@@ -147,7 +148,7 @@ int ioopm_list_remove(ioopm_list_t *list, size_t index) {
             current = current->next;
         }
         link_t *removed = list->last;
-        int value = removed->value;
+        elem_t value = removed->value;
         list->last = current;
         current->next = NULL;
         link_destroy(removed);
@@ -160,7 +161,7 @@ int ioopm_list_remove(ioopm_list_t *list, size_t index) {
             current = current->next;
         }
         link_t *removed = current->next;
-        int value = removed->value;
+        elem_t value = removed->value;
         current->next = current->next->next;
         link_destroy(removed); 
         list->size--;
@@ -168,10 +169,10 @@ int ioopm_list_remove(ioopm_list_t *list, size_t index) {
     }
 }
 
-int ioopm_list_get(ioopm_list_t *list, size_t index) {
+elem_t ioopm_list_get(ioopm_list_t *list, size_t index) {
     if (list->head == NULL || index >= ioopm_list_size(list)) {
         printf("Not valid");
-        return 0;
+        return (elem_t) {0};
     }
     else {
     link_t *current = list->head;
@@ -202,9 +203,9 @@ bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter) {
     return iter->current == NULL;
 }
 
-int ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
+elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
     if (iter->current == NULL) {
-        return 0;
+        return (elem_t) {0};
     }
     else {
     return iter->current->value;

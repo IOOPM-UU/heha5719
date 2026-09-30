@@ -4,8 +4,31 @@
 #include <string.h>
 #include "hash_table.h"
 #include "hash_table_iterator.h"
+#include "common.h"
 
 #define Delimiters "+-#@()[]{}.,:;!? \t\n\r"
+
+static size_t string_knr_hash(const char *str)
+{
+  size_t result = 0;
+
+  while (*str != '\0')
+  {
+    result = result * 31 + ((unsigned char) *str);
+    str++;
+  }
+
+  return result;
+}
+
+size_t string_hash(elem_t key)
+{
+  return string_knr_hash(key.s);
+}
+
+bool string_eq(elem_t a, elem_t b) {
+  return strcmp(a.s, b.s) == 0;
+}
 
 /// @brief Process a single word, updating its frequency
 /// @param word the word to process
@@ -13,12 +36,13 @@
 //FIXME 
 void process_word(char *word, ioopm_hash_table_t *ht)
 {
-  int freq = 0;
-  if (ioopm_hash_table_lookup(ht, word, &freq)) {
-    ioopm_hash_table_insert(ht, word, freq + 1);
+  elem_t result;
+  if (ioopm_hash_table_lookup(ht, string_elem(word), &result)) {
+    ioopm_hash_table_insert(ht, string_elem(word), int_elem(result.i + 1));
   }
   else {
-  ioopm_hash_table_insert(ht, word, 1);
+  char* word_copy = strdup(word);
+  ioopm_hash_table_insert(ht, string_elem(word_copy), int_elem(1));
   }
 }
 /// @brief Process a single file, updating the frequencies of its words
@@ -51,8 +75,8 @@ void process_file(char *filename, ioopm_hash_table_t *ht)
 /// @brief A word together with its frequency
 struct freq_word
 {
-  char *word;
-  int freq;
+  elem_t word;
+  elem_t freq;
 };
 
 /// @brief Compare the frequency of two freq_words through pointers to them
@@ -67,7 +91,7 @@ static int cmp_freq_words(const void *p1, const void *p2)
   const struct freq_word *w1 = p1;
   const struct freq_word *w2 = p2;
 
-  return w1->freq - w2->freq;
+  return w1->freq.i - w2->freq.i;
 }
 
 /// @brief Like @cmp_freq_words@ but with the comparison result reversed
@@ -92,7 +116,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
 
   for (int i = 1; i < argc; ++i)
   {
@@ -119,11 +143,20 @@ int main(int argc, char *argv[])
 
   for (size_t i = 0; i < size; ++i)
   {
-    printf("%s: %zu\n", freq_words[i].word, freq_words[i].freq);
+    printf("%s: %d\n", freq_words[i].word.s, freq_words[i].freq.i);
   }
 
   // FIXME: Leaks memory! Use valgrind to find out where that memory is
   // being allocated, and then insert code here to free it.
   ioopm_hash_table_iterator_destroy(it);
+
+  ioopm_hash_table_iterator_t *cleanup_it = ioopm_hash_table_iterator_create(ht);
+  while (!ioopm_hash_table_iterator_at_end(cleanup_it))
+  {
+    elem_t key = ioopm_hash_table_iterator_current_key(cleanup_it);
+    free(key.s);
+    ioopm_hash_table_iterator_advance(cleanup_it);
+  }
+  ioopm_hash_table_iterator_destroy(cleanup_it);
   ioopm_hash_table_destroy(ht);
 }
