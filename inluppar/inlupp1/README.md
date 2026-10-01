@@ -8,9 +8,17 @@ gcc -Wall -Wextra -g hash_table.c linked_list.c hash_table_tests.c -o hash_table
 
 Run:
 
-./hash_table_tests
+./hash_table_tests 
 
 The test program runs tests for the hash table, linked list, and their iterators.
+
+Or simply run: 
+
+make tests
+
+If you would like to see memory leaks run: 
+
+make valgrind
 
 ## Freq Count Compiling and running
 
@@ -35,3 +43,19 @@ Collisions are handled using linked lists.
 The linked list keeps track of both the first and last element to make append and prepend efficient.
 Invalid list operations print an error message and return an empty elem_t when necessary.
 Iterators are separate structs and do not own the data structure they iterate over.
+
+## Test Coverage
+Coverage was measured with gcov
+
+Run the coverage reports with:
+
+make coverage
+
+File 'hash_table.c'
+Lines executed:99.03% of 103
+Branches executed:100.00% of 36
+
+File 'linked_list.c'
+Lines executed:82.35% of 119
+Branches executed:95.00% of 40
+
