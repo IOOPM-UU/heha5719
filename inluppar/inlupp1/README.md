@@ -1,6 +1,4 @@
-## IOOPM Assignment 1
-
-This repository contains our implementation of the data structures and programs for Assignment 1 in IOOPM.
+## README IOOPM Inlupp 1
 
 ## Compiling and running
 
