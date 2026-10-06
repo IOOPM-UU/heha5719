@@ -8,11 +8,6 @@
 
 //This is a great example for both M39 and O44!
 
-/*
-  arr[5] = 5[arr] = *(arr + 5) = *(5 + arr)
-  *(arr + 5) = *(5 + arr) = 5[arr]
-*/
-
 #define No_Buckets 17
 
 typedef struct entry entry_t;
@@ -28,8 +23,6 @@ struct entry
 
 struct hash_table
 {
-  // DODGE: hard-coding number of buckets as No_Buckets.
-  // NOTE: addressing this dodge is optional.
   entry_t buckets[No_Buckets];
 
   ioopm_hash_function *hash_fn;
@@ -50,7 +43,6 @@ ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_
 static entry_t *entry_create(elem_t key, elem_t value, entry_t *next)
 {
   entry_t *entry = calloc(1, sizeof(entry_t));
-  // TODO: Stub
   entry->key = key;
   entry->value = value;
   entry->next = next;
@@ -197,6 +189,8 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
      }
   }
 }
+
+// First node is always a fake node, so we always begin at the 2nd node
 
 static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *it)
 {

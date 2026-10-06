@@ -29,5 +29,4 @@ tests: hash_table_tests
 clean:
 	rm -f $(PROGRAMS) *.o *.gcda *.gcno *.gcov
 
-.PHONY: all coverage clean
-
+.PHONY: all coverage clean 

@@ -33,7 +33,6 @@ bool string_eq(elem_t a, elem_t b) {
 /// @brief Process a single word, updating its frequency
 /// @param word the word to process
 /// @param ht a hash table containing the frequencies of the words found so far
-//FIXME 
 void process_word(char *word, ioopm_hash_table_t *ht)
 {
   elem_t result;
@@ -126,8 +125,7 @@ int main(int argc, char *argv[])
   size_t size = ioopm_hash_table_size(ht);
   struct freq_word freq_words[size];
 
-  // FIXME: Iterate over hash table to dump its words and
-  // frequencies into the array above
+  // Iterate over hash table to dump its words and frequencies into the array above
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
 
   size_t i = 0;
@@ -146,8 +144,7 @@ int main(int argc, char *argv[])
     printf("%s: %d\n", freq_words[i].word.s, freq_words[i].freq.i);
   }
 
-  // FIXME: Leaks memory! Use valgrind to find out where that memory is
-  // being allocated, and then insert code here to free it.
+  // Frees memory
   ioopm_hash_table_iterator_destroy(it);
 
   ioopm_hash_table_iterator_t *cleanup_it = ioopm_hash_table_iterator_create(ht);
