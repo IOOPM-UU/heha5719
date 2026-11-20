@@ -1,6 +1,4 @@
 package org.ioopm.calculator.ast;
-import org.ioopm.calculator.ast.*;
-
 
 
 public class Test {
@@ -303,6 +301,21 @@ public class Test {
         
         // Some errors are left to Java: 1 / 0 is Infinity
         testEvaluating(num(Double.POSITIVE_INFINITY), new Division(num(1), num(0)));
+
+        // Named constants behave like their value
+    testEvaluating(new Constant(84), new Addition(new NamedConstant("Answer", 42), new NamedConstant("Answer", 42)));
+
+    testPrinting("pi", new NamedConstant("pi", Math.PI));
+
+    // Redefining a named constant throws
+    try { 
+        new Assignment(new Constant(43), new NamedConstant("Answer", 42)).eval(new Environment());
+        System.out.println("Error: expected IllegalAssignmentException");
+        failed++;
+    }  catch (IllegalAssignmentException e) {
+        System.out.println("Passed: " + e.getMessage());
+        passed++;
+    }
     }
  
     // =====================================================================

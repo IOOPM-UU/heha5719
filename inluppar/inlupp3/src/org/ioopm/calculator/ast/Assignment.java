@@ -21,7 +21,10 @@ public class Assignment extends Binary {
     public SymbolicExpression eval(Environment vars) {
     SymbolicExpression lhs = getLhs().eval(vars);
     SymbolicExpression rhs = getRhs();
-    if(lhs.isConstant() && rhs.isVariable()) {
+    if (rhs.isNamedConstant()) {
+        throw new IllegalAssignmentException();
+    }
+    if (lhs.isConstant() && rhs.isVariable()) {
         vars.put((Variable) rhs, lhs);
         return new Constant(lhs.getValue());
     } else {

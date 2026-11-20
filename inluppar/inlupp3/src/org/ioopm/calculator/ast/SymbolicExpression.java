@@ -14,6 +14,10 @@ public boolean isCommand() {
     return false;
 }
 
+public boolean isNamedConstant() {
+    return false;
+}
+
 public double getValue() {
     throw new RuntimeException("getValue() called on expression with no constant");
 }

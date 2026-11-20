@@ -1,6 +1,6 @@
-package inluppar.inlupp3_helo.parser;
+package org.ioopm.calculator.parser;
 
-import inluppar.inlupp3_helo.ast.*;
+import org.ioopm.calculator.ast.*;
 
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -143,8 +143,8 @@ public class CalculatorParser {
             throw new IllegalExpressionException("Error: cannot redefine " + this.st.sval);
         }
 
-        if (Constants.namedConstants.containsKey(this.st.sval)) {
-            result = new NamedConstant(st.sval, Constants.namedConstants.get(st.sval));
+        if (Constants.NamedConstant.containsKey(this.st.sval)) {
+            result = new NamedConstant(st.sval, Constants.NamedConstant.get(st.sval));
         } else {
             result = new Variable(this.st.sval);
         }
