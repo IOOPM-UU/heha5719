@@ -317,6 +317,88 @@ public class Test {
         passed++;
     }
     }
+    public static void commandTests() {
+    System.out.println();
+    System.out.println("===== Commands =====");
+
+    SymbolicExpression vars = Vars.instance();
+    SymbolicExpression quit = Quit.instance();
+    
+
+    // Singletons: instance() always returns the same object
+    if (Vars.instance() == Vars.instance()) { System.out.println("Passed: Vars is a singleton"); passed++; }
+    else { System.out.println("Error: Vars.instance() gives different objects"); failed++; }
+
+    if (Quit.instance() == Quit.instance()) { System.out.println("Passed: Quit is a singleton"); passed++; }
+    else { System.out.println("Error: Quit.instance() gives different objects"); failed++; }
+
+    // Vars and Quit are different commands
+    if (vars != quit && !vars.equals(quit)) { System.out.println("Passed: Vars and Quit are different"); passed++; }
+    else { System.out.println("Error: Vars and Quit are considered the same"); failed++; }
+
+    // isCommand is true for commands
+    if (vars.isCommand() && quit.isCommand()) { System.out.println("Passed: Vars and Quit are commands"); passed++; }
+    else { System.out.println("Error: isCommand() is false for a command"); failed++; }
+
+    // isCommand is false for expressions
+    if (!new Constant(5).isCommand()
+            && !new Variable("x").isCommand()
+            && !new Addition(new Constant(1), new Variable("x")).isCommand()) {
+        System.out.println("Passed: expressions are not commands"); passed++;
+    } else {
+        System.out.println("Error: isCommand() is true for an expression"); failed++;
+    }
+
+    // Commands are not constants
+    if (!vars.isConstant() && !quit.isConstant()) { System.out.println("Passed: commands are not constants"); passed++; }
+    else { System.out.println("Error: a command says it is a constant"); failed++; }
+
+    // A variable called "vars" is not the vars command
+    if (!vars.equals(new Variable("vars"))) { System.out.println("Passed: Vars is not a variable named vars"); passed++; }
+    else { System.out.println("Error: Vars equals a variable named vars"); failed++; }
+
+    // Commands may not be evaluated
+    try {
+        vars.eval(new Environment());
+        System.out.println("Error: eval on Vars should throw"); failed++;
+    } catch (RuntimeException e) {
+        System.out.println("Passed: eval on Vars throws"); passed++;
+    }
+    try {
+        quit.eval(new Environment());
+        System.out.println("Error: eval on Quit should throw"); failed++;
+    } catch (RuntimeException e) {
+        System.out.println("Passed: eval on Quit throws"); passed++;
+    }
+        // ===== Clear =====
+    SymbolicExpression clear = Clear.instance();
+
+    // Clear is a singleton
+    if (Clear.instance() == Clear.instance()) { System.out.println("Passed: Clear is a singleton"); passed++; }
+    else { System.out.println("Error: Clear.instance() gives different objects"); failed++; }
+
+    // Clear is a command, and different from the other commands
+    if (clear.isCommand() && clear != vars && clear != quit) { System.out.println("Passed: Clear is its own command"); passed++; }
+    else { System.out.println("Error: Clear is not a separate command"); failed++; }
+
+    // Clear may not be evaluated
+    try {
+        clear.eval(new Environment());
+        System.out.println("Error: eval on Clear should throw"); failed++;
+    } catch (RuntimeException e) {
+        System.out.println("Passed: eval on Clear throws"); passed++;
+    }
+
+    // Set up an environment with some variables, like the user would
+    Environment env = new Environment();
+    new Assignment(new Constant(1), new Variable("x")).eval(env);
+    new Assignment(new Constant(2), new Variable("y")).eval(env);
+    new Assignment(new Addition(new Variable("z"), new Constant(3)), new Variable("w")).eval(env);
+
+    if (env.size() == 3) { System.out.println("Passed: 3 variables before clear"); passed++; }
+    else { System.out.println("Passed: expected 3 variables before clear"); 
+    }
+}
  
     // =====================================================================
  
@@ -324,8 +406,10 @@ public class Test {
         printingTests();
         equalsTests();
         evaluationTests();
+        commandTests();    
  
         System.out.println();
         System.out.println(passed + " passed, " + failed + " failed");
     }
+    
 }
