@@ -7,5 +7,9 @@ public class Quit extends Command {
     public static Quit instance() {
         return theInstance;
     }
+
+    public IsQuit() {
+        return true;
+    }
 }
 
